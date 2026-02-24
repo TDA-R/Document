@@ -20,6 +20,7 @@
   
   
 
+<meta name="author" content="Kenny Wang" />
 
 
 <meta name="date" content="2025-10-29" />
@@ -51,10 +52,6 @@
 <link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
 <link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
 <script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
-<link href="libs/htmltools-fill-0.5.8.1/fill.css" rel="stylesheet" />
-<script src="libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
-<script src="libs/d3-4.9.1/d3.min.js"></script>
-<script src="libs/forceNetwork-binding-0.4.1/forceNetwork.js"></script>
 
 
 <style type="text/css">
@@ -140,6 +137,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
       <nav role="navigation">
 
 <ul class="summary">
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Introduction</a></li>
 <li class="chapter" data-level="1" data-path="mapper.html"><a href="mapper.html"><i class="fa fa-check"></i><b>1</b> Mapper</a>
 <ul>
 <li class="chapter" data-level="1.1" data-path="mapper.html"><a href="mapper.html#setup"><i class="fa fa-check"></i><b>1.1</b> Setup</a></li>
@@ -182,10 +180,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="optimizations-for-cover" class="section level1 hasAnchor" number="3">
 <h1><span class="header-section-number">3</span> Optimizations for cover<a href="optimizations-for-cover.html#optimizations-for-cover" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p>In the CoverTest.R, you can see that if the number of interval is fixed, you might get a bad result as shown below because intervals are not enough for the whole data points (Figure 1). Moreover, even you use (domain_max - domain_min) / num_intervals to get the best width size, stride cover won’t give you best data calculated from center of data points (Figure 2).</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="optimizations-for-cover.html#cb19-1" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">include_graphics</span>(<span class="st">&quot;./man/figures/stride_extension_old.png&quot;</span>)</span></code></pre></div>
-<p><img src="man/figures/stride_extension_old.png" width="436" /></p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="optimizations-for-cover.html#cb20-1" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">include_graphics</span>(<span class="st">&quot;./man/figures/stride_extension_old2.png&quot;</span>)</span></code></pre></div>
-<p><img src="man/figures/stride_extension_old2.png" width="498" /></p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="optimizations-for-cover.html#cb17-1" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">include_graphics</span>(<span class="st">&quot;./man/figures/stride_extension_old.png&quot;</span>)</span></code></pre></div>
+<p><img src="man/figures/stride_extension_old.png" alt="" width="436" /></p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="optimizations-for-cover.html#cb18-1" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">include_graphics</span>(<span class="st">&quot;./man/figures/stride_extension_old2.png&quot;</span>)</span></code></pre></div>
+<p><img src="man/figures/stride_extension_old2.png" alt="" width="498" /></p>
 <p>To solve the problem, you can choose only <strong>interval_width</strong> instead of <strong>intervals</strong>, and the equation is define as :</p>
 <ul>
 <li><span class="math inline">\(stride: w\Big(1-\frac{p}{100}\Big),  \text{cover_span}=(n-1)\cdot \text{stride} + w\)</span></li>
@@ -195,8 +193,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p><span class="math inline">\(Stride:{\;n \;\ge\; \Big\lceil \frac{L - w}{\,w(1-\frac{p}{100})\,}\Big\rceil + 1\;}\)</span></p>
 <p><span class="math inline">\(Extention :{\;n \;\ge\; \Big\lceil \frac{L}{w} - \frac{p}{100}\Big\rceil\;}\)</span></p>
 <p>Finally, a uniformed intervals for your data points are constructed.</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="optimizations-for-cover.html#cb21-1" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">include_graphics</span>(<span class="st">&quot;./man/figures/stride_extension_new.png&quot;</span>)</span></code></pre></div>
-<p><img src="man/figures/stride_extension_new.png" width="432" /></p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="optimizations-for-cover.html#cb19-1" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">include_graphics</span>(<span class="st">&quot;./man/figures/stride_extension_new.png&quot;</span>)</span></code></pre></div>
+<p><img src="man/figures/stride_extension_new.png" alt="" width="432" /></p>
 
 </div>
             </section>

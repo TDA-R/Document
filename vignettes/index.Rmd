@@ -7,3 +7,9 @@ output:
   bookdown::gitbook: default
 documentclass: book
 ---
+
+# Introduction {-}
+
+Welcome to the technical documentation for the MapperAlgo package.
+
+This document covers the implementation details of the Mapper algorithm for Topological Data Analysis (TDA). You can use the menu on the left to navigate through parameter settings, file structures, and performance optimizations.

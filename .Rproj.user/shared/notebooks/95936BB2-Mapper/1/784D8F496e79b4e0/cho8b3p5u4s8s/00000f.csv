@@ -1,6 +1,0 @@
-"0",""
-"0","source('../../MapperAlgo/R/Plotter.R')"
-"0",""
-"0","g <- graph_from_adjacency_matrix(Mapper$adjacency, mode = ""undirected"")"
-"0","e_result <- eigen_centrality(g)"
-"0","MapperPlotter(Mapper, label=e_result$vector, original_data=data, avg=FALSE, use_embedding=TRUE)"

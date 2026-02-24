@@ -1,0 +1,14 @@
+mapper
+setup
+run-mapper-algorithm
+plots
+correlation-between-mapper-graph-and-features
+grid-search-for-optimal-cover-parameters
+file-explain
+mapperalgo-params
+output-data
+file-explanation
+cover
+convertlevelsets
+optimizations-for-cover
+computation-performance
