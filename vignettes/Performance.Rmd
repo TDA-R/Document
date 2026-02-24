@@ -1,0 +1,18 @@
+---
+title: "Performance"
+output: html_document
+latex_engine: pdflatex
+date: "2025-10-29"
+---
+
+# Computation Performance
+
+Figures 3 and 4 illustrate the impact of parallel computing introduced in Version 1.0.2 using the MNIST dataset. Figure 3 visualizes the time taken for different sample sizes when reducing the input to two dimensions using PCA, demonstrating how parallel computing accelerates computation. Figure 4 keeps the sample size fixed while incrementally increasing the number of dimensions in each iteration. It clearly shows that the number of features used in filter functions significantly affects computing time. You can find the code in Performance.R
+
+```{r}
+knitr::include_graphics("./man/figures/Performance1.png")
+```
+
+```{r}
+knitr::include_graphics("./man/figures/Performance2.png")
+```

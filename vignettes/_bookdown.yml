@@ -1,0 +1,2 @@
+rmd_files:
+  html: ["Mapper.Rmd", "FileExplain.Rmd", "Optimizations.Rmd", "Performance.Rmd"]
