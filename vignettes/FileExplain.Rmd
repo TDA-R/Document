@@ -1,12 +1,3 @@
----
-title: "FileExplain"
-output:
-  pdf_document: default
-  html_document: default
-date: "2025-10-28"
-latex_engine: pdflatex
----
-
 # File Explain
 
 ## MapperAlgo Params
