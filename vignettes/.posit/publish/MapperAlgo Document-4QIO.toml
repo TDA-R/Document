@@ -14,10 +14,10 @@ files = [
   '/.posit/publish/deployments/deployment-90TS.toml',
   '/Mapper.Rmd',
   '/Optimizations.Rmd',
-  '/Performance.Rmd',
   '/FileExplain.Rmd',
   '/man',
-  '/AdvanceMapper.Rmd'
+  '/AdvanceMapper.Rmd',
+  '/Performance.Rmd'
 ]
 title = 'MapperAlgo Document'
 

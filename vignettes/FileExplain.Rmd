@@ -1,55 +1,6 @@
-# File Explain
+# File explanation
 
-## MapperAlgo Params
-
-MapperAlgo funtion remains several params, **filter_values** is the data you get after pojection, for example, the output of PCA. **Intervals** is how many areas you want, in the example below, you cut the data into 4 areas, and the 4 areas will be **ovelapped** in 30%, then it will calculate the width for you. You can also choose **interval_width** as input, but you can’t use it and Intervals at the same time because it will cause nonuniform intervals in space, vice versa.
-
-You can choose hierarchical, kmeans, dbscan, or pam in **methods**, and according to their original package, you must input a list of params to **method_params**. Then, according to the original author and the paper, stride or extension in **cover_type** can be choose in the function, more informations are explained in File explaination. The num_cores can be set depend on how many cores you want to use for parrallel computing.
-
-MapperPlotter is just plotting the nodes and edges, use forceNetwork if you want to interact with the plot, and ggraph could get you more informations in label. **avg** will give you the mean feature of each node if you set it as TRUE, in the example below, circle_data\$circle is the feature.
-
-```         
-time_taken <- system.time({
-  Mapper <- MapperAlgo(
-    filter_values = data[,1:4],
-    # filter_values = circle_data[,2:3],
-    percent_overlap = 30,
-    methods = "dbscan",
-    method_params = list(eps = 1, minPts = 1),
-    # methods = "hierarchical",
-    # method_params = list(num_bins_when_clustering = 10, method = 'ward.D2'),
-    # methods = "kmeans",
-    # method_params = list(max_kmeans_clusters = 2),
-    # methods = "pam",
-    # method_params = list(num_clusters = 2),
-    cover_type = 'stride',
-    # intervals = 4,
-    interval_width = 1,
-    num_cores = 12
-    )
-})
-time_taken
-```
-
-### Output data
-
-| Name | Context |
-|------------------------------------|------------------------------------|
-| **adjacency** | 24x24 adjacency matrix, 0 or 1 |
-| **num_vertices** | Mapper nodes num |
-| **level_of_vertex** | Each node represent to which level set index, correspond to intervals. |
-| Length 24 correspond to each node |  |
-| **points_in_vertex** | Each node carries original data index |
-| **points_in_level_set** | Each level set(16) include data point index, level set represent data subset in a lens function |
-| **vertices_in_level_set** | Which node represent to a level set |
-
-```{r}
-knitr::include_graphics("./man/figures/MapperOutput.png")
-```
-
-## File explanation
-
-### Cover
+## Cover
 
 Calculate range function
 

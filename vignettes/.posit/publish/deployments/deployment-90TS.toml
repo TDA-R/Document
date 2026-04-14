@@ -7,12 +7,12 @@ created_at = ''
 dismissed_at = ''
 type = 'rmd'
 configuration_name = 'MapperAlgo Document-4QIO'
-id = '019d8bc2-4ec9-5465-5c44-7f162c8dfb3b'
-dashboard_url = 'https://connect.posit.cloud/kennywang112/content/019d8bc2-4ec9-5465-5c44-7f162c8dfb3b'
-direct_url = 'https://019d8bc2-4ec9-5465-5c44-7f162c8dfb3b.share.connect.posit.cloud'
-logs_url = 'https://connect.posit.cloud/kennywang112/content/019d8bc2-4ec9-5465-5c44-7f162c8dfb3b/history'
-deployed_at = '2026-04-14T12:38:38+01:00'
-bundle_id = '019d8bc9-3558-005d-7c31-89646a9a2eb8'
+id = '019c9000-f3f9-6599-47b4-1cff4047c68f'
+dashboard_url = 'https://connect.posit.cloud/kennywang112/content/019c9000-f3f9-6599-47b4-1cff4047c68f'
+direct_url = 'https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud'
+logs_url = 'https://connect.posit.cloud/kennywang112/content/019c9000-f3f9-6599-47b4-1cff4047c68f/history'
+deployed_at = '2026-04-14T13:28:01+01:00'
+bundle_id = '019d8bf6-777a-2030-d268-ca784a4a31a7'
 files = [
   '.posit/publish/MapperAlgo Document-4QIO.toml',
   '.posit/publish/deployments/deployment-90TS.toml',
@@ -38,11 +38,6 @@ files = [
 [connect_cloud]
 account_name = 'kennywang112'
 
-[deployment_error]
-code = 'unknown'
-message = 'Unable to render: Unable to render your content. Please check the logs for more information.'
-operation = 'publish/deployContent'
-
 [configuration]
 product_type = 'connect_cloud'
 '$schema' = 'https://cdn.posit.co/publisher/schemas/posit-publishing-schema-v3.json'
@@ -57,10 +52,10 @@ files = [
   '/.posit/publish/deployments/deployment-90TS.toml',
   '/Mapper.Rmd',
   '/Optimizations.Rmd',
-  '/Performance.Rmd',
   '/FileExplain.Rmd',
   '/man',
-  '/AdvanceMapper.Rmd'
+  '/AdvanceMapper.Rmd',
+  '/Performance.Rmd'
 ]
 title = 'MapperAlgo Document'
 

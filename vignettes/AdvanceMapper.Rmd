@@ -18,7 +18,7 @@ In F-Mapper, instead of stating the node belongs to interval A, the model assume
 * `cluster_n`: The specified number of fuzzy clusters (i.e., the final number of intervals in the Cover).
 * `fcm_threshold`: The membership degree threshold. A lower value means a looser standard for determining overlap, results in more edges in the final graph.
 
-```{r}
+```
 # F-Mapper Execution Example
 FMapper <- FuzzyMapperAlgo(
   original_data = data[, 1:4],
@@ -47,7 +47,7 @@ G-Mapper employs a recursive testing strategy that resembles cell division:
 * `g_overlap`: The geometric overlap extension ratio. It determines how far the split intervals should cross over into each other. A higher value results in a more tightly connected graph.
 
 
-```{r}
+```
 # G-Mapper Execution Example
 GMapper <- GMapperAlgo(
   original_data = data[, 1:4],
@@ -58,3 +58,4 @@ GMapper <- GMapperAlgo(
   method_params = list(max_kmeans_clusters = 2),
   num_cores = 12
 )
+```
