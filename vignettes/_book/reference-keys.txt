@@ -12,3 +12,11 @@ cover
 convertlevelsets
 optimizations-for-cover
 computation-performance
+example-code
+f-mapper-and-g-mapper
+f-mapper-fuzzy-mapper
+core-concepts-mechanism
+parameter-explanation
+g-mapper-gaussian-mapper
+core-concepts-mechanism-1
+parameter-explanation-1

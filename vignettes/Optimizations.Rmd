@@ -10,10 +10,11 @@ knitr::include_graphics("./man/figures/stride_extension_old.png")
 knitr::include_graphics("./man/figures/stride_extension_old2.png")
 ```
 
+
 To solve the problem, you can choose only **interval_width** instead of **intervals**, and the equation is define as :
 
--   $stride: w\Big(1-\frac{p}{100}\Big),  \text{cover_span}=(n-1)\cdot \text{stride} + w$
--   $extension:\text {centre}\pm\tfrac{w}{2}\tfrac{p}{100}, \text{cover_span}=n\cdot w + w\frac{p}{100} = w\Big(n+\frac{p}{100}\Big)$
+-   $stride: w\Big(1-\frac{p}{100}\Big), \text{cover\_span}=(n-1)\cdot \text{stride} + w$
+-   $extension: \text{centre}\pm\tfrac{w}{2}\tfrac{p}{100}, \text{cover\_span}=n\cdot w + w\frac{p}{100} = w\Big(n+\frac{p}{100}\Big)$
 
 To get the best *n*, you then get the equation below :
 

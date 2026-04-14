@@ -1,11 +1,20 @@
 # Mapper
 
+The core of applying the projection space, cover, interval, and clustering is the Mapper algorithm. The Mapper algorithm takes in the original data, filter values, cover parameters, and clustering method to produce a simplicial complex that represents the structure of the original. The output includes an adjacency matrix representing the connections between nodes, the number of vertices (nodes), the level of each vertex, and the points contained in each vertex and level set.
+```{r}
+knitr::include_graphics("./man/figures/mapper.png")
+```
+
+This is the example of the Mapper graph generated from the MNIST dataset. Each node represents a cluster of data points, and edges represent connections between clusters based on shared data points. The structure of the graph can reveal insights about the underlying data distribution and relationships between features.
+
 ```{r}
 knitr::include_graphics("./man/figures/MNISTMapper.png")
 ```
 
-## Setup
-```{r setup, include=FALSE, eval=FALSE}
+
+## Example Code
+
+```{r}
 library(ggplot2)
 library(igraph)
 library(networkD3)
@@ -28,13 +37,16 @@ data("iris")
 data <- iris
 ```
 
+
+
 ## Run Mapper Algorithm
 There are several clustering methods available, including DBSCAN, hierarchical clustering, k-means, and PAM. But you need to input all of the params required for the chosen method in method_params.
-```{r, eval=FALSE}
+
+```{r}
 time_taken <- system.time({
   Mapper <- MapperAlgo(
     original_data = data[,1:4],
-    filter_values = data[,1:4],
+    filter_values = data[,1:2],
     # filter_values = circle_data[,2:3],
     percent_overlap = 30,
     methods = "dbscan",
@@ -54,10 +66,12 @@ time_taken <- system.time({
 time_taken
 ```
 
+
+
 ## Plots
 There are built-in plotting functions to visualize the Mapper graph. You can choose between "ggraph" and "forceNetwork" types. Additionally, you can choose to average feature values over nodes or use conditional probability embeddings.
 
-```{r, eval=FALSE}
+```{r}
 
 source('../../MapperAlgo/R/Plotter.R')
 
@@ -66,19 +80,23 @@ e_result <- eigen_centrality(g)
 MapperPlotter(Mapper, label=e_result$vector, original_data=data, avg=FALSE, use_embedding=TRUE)
 ```
 
+
+
 ## Correlation between Mapper graph and features
 Sometimes it is useful to find out whether the Mapper graph structure correlates with certain features in the data. For example, if Sepal.Length densities are similar to Sepal.Width densities across the nodes in the Mapper graph.
 
-```{r, eval=FALSE}
+```{r}
 source('../../MapperAlgo/R/MapperCorrelation.R')
 
 MapperCorrelation(Mapper, original_data = original_data, labels = list(data$Sepal.Length, data$Sepal.Width))
 ```
 
+
+
 ## Grid Search for optimal cover parameters
 If you want to find optimal cover parameters for your data, you can use the GridSearch function. Observing the convergence of certain graph metrics as cover parameters change can help you select appropriate values.
 
-```{r, eval=FALSE}
+```{r}
 source('../../MapperAlgo/R/GridSearch.R')
 cpe_params <- list("PW_group", "Species", "wide", "versicolor")
 data$PW_group <- ifelse(data$Sepal.Width > 1.5, "wide", "narrow")
@@ -95,9 +113,4 @@ GridSearch(
   avg = TRUE,
   use_embedding = cpe_params
 )
-
 ```
-
-
-
-
