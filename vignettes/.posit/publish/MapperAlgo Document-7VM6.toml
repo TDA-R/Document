@@ -15,7 +15,8 @@ files = [
   '/Mapper.Rmd',
   '/Optimizations.Rmd',
   '/Performance.Rmd',
-  '/man'
+  '/man',
+  '/AdvanceMapper.Rmd'
 ]
 title = 'MapperAlgo Document'
 
