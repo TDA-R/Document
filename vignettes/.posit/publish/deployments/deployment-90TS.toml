@@ -11,27 +11,25 @@ id = '019c9000-f3f9-6599-47b4-1cff4047c68f'
 dashboard_url = 'https://connect.posit.cloud/kennywang112/content/019c9000-f3f9-6599-47b4-1cff4047c68f'
 direct_url = 'https://019c9000-f3f9-6599-47b4-1cff4047c68f.share.connect.posit.cloud'
 logs_url = 'https://connect.posit.cloud/kennywang112/content/019c9000-f3f9-6599-47b4-1cff4047c68f/history'
-deployed_at = '2026-04-14T13:28:01+01:00'
-bundle_id = '019d8bf6-777a-2030-d268-ca784a4a31a7'
+deployed_at = '2026-08-29T18:34:33+01:00'
+bundle_id = '01a04e96-3090-48eb-a0eb-7bef1f88853d'
 files = [
   '.posit/publish/MapperAlgo Document-4QIO.toml',
   '.posit/publish/deployments/deployment-90TS.toml',
-  'AdvanceMapper.Rmd',
-  'FileExplain.Rmd',
   'Mapper.Rmd',
-  'Optimizations.Rmd',
-  'Performance.Rmd',
+  'SimplicialComplex.Rmd',
   '_bookdown.yml',
   'index.Rmd',
+  'man/figures/ComplexConstructions.png',
   'man/figures/Cover.png',
+  'man/figures/DiagramMatching.png',
+  'man/figures/FloodComplex.png',
   'man/figures/MNISTMapper.png',
-  'man/figures/MapperOutput.png',
   'man/figures/Performance1.png',
   'man/figures/Performance2.png',
+  'man/figures/PersistenceDiagram.png',
+  'man/figures/PersistenceLandscape.png',
   'man/figures/mapper.png',
-  'man/figures/stride_extension_new.png',
-  'man/figures/stride_extension_old.png',
-  'man/figures/stride_extension_old2.png',
   'renv.lock'
 ]
 
@@ -51,13 +49,10 @@ files = [
   '/.posit/publish/MapperAlgo Document-4QIO.toml',
   '/.posit/publish/deployments/deployment-90TS.toml',
   '/Mapper.Rmd',
-  '/Optimizations.Rmd',
-  '/FileExplain.Rmd',
-  '/man',
-  '/AdvanceMapper.Rmd',
-  '/Performance.Rmd'
+  '/SimplicialComplex.Rmd',
+  '/man'
 ]
-title = 'MapperAlgo Document'
+title = 'TDA-R Documentation'
 
 [configuration.r]
 version = '4.5.1'
