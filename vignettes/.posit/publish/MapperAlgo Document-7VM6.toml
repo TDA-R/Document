@@ -4,19 +4,18 @@
 product_type = 'connect_cloud'
 '$schema' = 'https://cdn.posit.co/publisher/schemas/posit-publishing-schema-v3.json'
 type = 'rmd'
-entrypoint = 'index.Rmd'
+entrypoint = '_bookdown.yml'
 validate = true
 files = [
   '/_bookdown.yml',
   '/index.Rmd',
+  '/renv.lock',
   '/.posit/publish/MapperAlgo Document-7VM6.toml',
   '/.posit/publish/deployments/deployment-H3NF.toml',
-  '/FileExplain.Rmd',
   '/Mapper.Rmd',
-  '/Optimizations.Rmd',
-  '/Performance.Rmd',
+  '/SimplicialComplex.Rmd',
   '/man'
 ]
-title = 'MapperAlgo Document'
+title = 'TDA-R Documentation'
 
 [r]

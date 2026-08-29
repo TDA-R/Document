@@ -1,126 +1,193 @@
-# Mapper
+# MapperAlgo
 
-The core of applying the projection space, cover, interval, and clustering is the Mapper algorithm. The Mapper algorithm takes in the original data, filter values, cover parameters, and clustering method to produce a simplicial complex that represents the structure of the original. The output includes an adjacency matrix representing the connections between nodes, the number of vertices (nodes), the level of each vertex, and the points contained in each vertex and level set.
-```{r}
+The Mapper construction turns a point cloud into an interpretable graph. A filter (or lens) maps observations to a low-dimensional space, an overlapping cover divides that space into level sets, and observations are clustered independently inside every level set. Each cluster becomes a vertex; two vertices are joined when they contain at least one common observation.
+
+```{r mapper-workflow, echo=FALSE, out.width="72%", fig.align="center"}
 knitr::include_graphics("./man/figures/mapper.png")
 ```
 
-This is the example of the Mapper graph generated from the MNIST dataset. Each node represents a cluster of data points, and edges represent connections between clusters based on shared data points. The structure of the graph can reveal insights about the underlying data distribution and relationships between features.
+## Installation and a minimal example
 
-```{r}
+Use the installed package for ordinary analysis. During package development, `pkgload::load_all("../../MapperAlgo")` may replace `library(MapperAlgo)` when this document is run from `Document/vignettes`.
+
+```{r mapper-example, eval=FALSE}
+library(MapperAlgo)
+
+X <- scale(iris[, 1:4])
+lens <- prcomp(X)$x[, 1:2]
+
+mapper <- MapperAlgo(
+  original_data = X,
+  filter_values = lens,
+  intervals = 6,
+  percent_overlap = 30,
+  methods = "kmeans",
+  method_params = list(max_kmeans_clusters = 3),
+  cover_type = "stride",
+  num_cores = 1
+)
+```
+
+`original_data` is used for within-level-set clustering, whereas `filter_values` defines the cover. Supply exactly one of `intervals` and `interval_width`: the package computes the other quantity. For a multidimensional lens, a product cover is formed across its columns.
+
+## Covers and level-set indexing
+
+`cover_type = "stride"` uses intervals of width \(w\) whose starting positions differ by \(w(1-p/100)\). `cover_type = "extension"` places width-\(w\) anchors without overlap, then extends each boundary by \(wp/200\). In both cases, `percent_overlap` is entered as a percentage such as `30`, not as `0.30`.
+
+```{r mapper-cover, echo=FALSE, out.width="76%", fig.align="center"}
+knitr::include_graphics("./man/figures/Cover.png")
+```
+
+`cover_points()` returns the row indices inside one rectangular level set. Internally, `to_lsmi()` converts a flat level-set index into its coordinate-wise multi-index, and `to_lsfi()` performs the inverse conversion. These helpers allow a product cover to be traversed with one loop while preserving its multidimensional location.
+
+## Clustering within level sets
+
+The `methods` argument selects one of four implemented methods. The corresponding controls belong in `method_params`.
+
+| `methods` value | Principal controls | Behaviour |
+|---|---|---|
+| `"hierarchical"` | `method`, `num_bins_when_clustering` | Cuts a hierarchical tree at the first empty distance-histogram bin. |
+| `"kmeans"` | `max_kmeans_clusters` | Searches up to the requested number of centres; the default maximum is two. |
+| `"dbscan"` | `eps`, `minPts` | Excludes observations labelled as noise when positive clusters exist. |
+| `"pam"` | `num_clusters` | Uses partitioning around medoids and caps the requested count below the local sample size. |
+
+Independent level sets are processed by a PSOCK worker pool controlled by `num_cores`. Cover construction, worker start-up, and graph assembly remain outside that parallel loop.
+
+## The returned Mapper object
+
+`MapperAlgo()` returns an object of class `Mapper`. `FuzzyMapperAlgo()` and `GMapperAlgo()` use the same core representation and add their own class and input parameters.
+
+| Field | Meaning |
+|---|---|
+| `adjacency` | Symmetric, zero-diagonal vertex adjacency matrix. |
+| `num_vertices` | Number of clusters, hence Mapper vertices. |
+| `level_of_vertex` | Level-set index from which each vertex was produced. |
+| `points_in_vertex` | Original observation indices assigned to each vertex. |
+| `points_in_level_set` | Observation indices pulled back into each cover element. |
+| `vertices_in_level_set` | Vertex indices produced by each cover element. |
+| `input_params` | Controls retained for inspection and reproducibility. |
+
+Edges are created when the two lists in `points_in_vertex` intersect. The adjacency matrix therefore records the nerve of the clustered pullback cover, while the index lists preserve the correspondence to the input data.
+
+## Interactive plotting and PNG export
+
+`MapperPlotter()` returns a `networkD3` widget. Vertex size represents the number of observations, edge weight represents shared observations, and colour can show a majority label, an average numeric label, or a precomputed embedding statistic. Because a widget is HTML rather than a native R graphics object, save it with `save_mapper_png()`.
+
+```{r mapper-save, eval=FALSE}
+widget <- MapperPlotter(
+  Mapper = mapper,
+  original_data = X,
+  label = iris$Species,
+  avg = FALSE,
+  use_embedding = FALSE
+)
+
+save_mapper_png(
+  widget,
+  png_path = "./man/figures/IrisMapper.png",
+  vwidth = 1400,
+  vheight = 1000,
+  zoom = 2,
+  delay = 0.7
+)
+```
+
+The export uses `htmlwidgets` and `webshot2`; a working Chrome or Chromium installation is therefore required for the screenshot step. Once saved, the static PNG can be included in the Posit document without rebuilding the widget.
+
+## MNIST example
+
+Download `mnist_train.csv` and `mnist_test.csv` from the [MNIST dataset page](https://git-disl.github.io/GTDLBench/datasets/mnist_datasets/) and place them under `PaperExample/Data/MNIST_CSV/`. From the `PaperExample` directory, the following extension to `mapper.R` saves the graph used here:
+
+```{r mnist-save, eval=FALSE}
+source("mapper.R")
+
+mnist_widget <- MapperPlotter(
+  Mapper = Mapper,
+  original_data = mnist_sample,
+  label = labels,
+  avg = FALSE,
+  use_embedding = FALSE
+)
+
+save_mapper_png(
+  mnist_widget,
+  "../Document/vignettes/man/figures/MNISTMapper.png",
+  vwidth = 1600,
+  vheight = 1100,
+  zoom = 2,
+  delay = 1
+)
+```
+
+The published page reads the already generated file:
+
+```{r mnist-static, echo=FALSE, out.width="82%", fig.align="center"}
 knitr::include_graphics("./man/figures/MNISTMapper.png")
 ```
 
+## F-Mapper: a fuzzy learned cover
 
-## Example Code
+`FuzzyMapperAlgo()` replaces the rectangular cover by fuzzy c-means membership functions in the filter space. `cluster_n` specifies the number of fuzzy cover elements. An observation belongs to cover element \(j\) when its membership exceeds `fcm_threshold`; if no threshold is supplied, the package uses `min(0.1, 1 / cluster_n)`. The pullback sets may overlap, after which the same clustering and nerve construction used by conventional Mapper is applied.
 
-```
-library(ggplot2)
-library(igraph)
-library(networkD3)
-library(parallel)
-library(foreach)
-library(doParallel)
-library(htmlwidgets)
-library(webshot)
-library(tidygraph)
-library(ggraph)
-
-source('../../MapperAlgo/R/EdgeVertices.R')
-source('../../MapperAlgo/R/ConvertLevelsets.R')
-source('../../MapperAlgo/R/Cover.R')
-source('../../MapperAlgo/R/Cluster.R')
-source('../../MapperAlgo/R/SimplicialComplex.R')
-source('../../MapperAlgo/R/MapperAlgo.R')
-
-data("iris")
-data <- iris
-```
-
-## Run Mapper Algorithm
-There are several clustering methods available, including DBSCAN, hierarchical clustering, k-means, and PAM. But you need to input all of the params required for the chosen method in method_params.
-
-```
-time_taken <- system.time({
-  Mapper <- MapperAlgo(
-    original_data = data[,1:4],
-    filter_values = data[,1:2],
-    # filter_values = circle_data[,2:3],
-    percent_overlap = 30,
-    methods = "dbscan",
-    method_params = list(eps = 1, minPts = 1),
-    # methods = "hierarchical",
-    # method_params = list(num_bins_when_clustering = 10, method = 'ward.D2'),
-    # methods = "kmeans",
-    # method_params = list(max_kmeans_clusters = 2),
-    # methods = "pam",
-    # method_params = list(num_clusters = 2),
-    cover_type = 'stride',
-    # intervals = 4,
-    interval_width = 1,
-    num_cores = 12
-    )
-})
-time_taken
-```
-
-### MapperAlgo Params
-
-MapperAlgo funtion remains several params, **filter_values** is the data you get after pojection, for example, the output of PCA. **Intervals** is how many areas you want, in the example below, you cut the data into 4 areas, and the 4 areas will be **ovelapped** in 30%, then it will calculate the width for you. You can also choose **interval_width** as input, but you can’t use it and Intervals at the same time because it will cause nonuniform intervals in space, vice versa.
-
-You can choose hierarchical, kmeans, dbscan, or pam in **methods**, and according to their original package, you must input a list of params to **method_params**. Then, according to the original author and the paper, stride or extension in **cover_type** can be choose in the function, more informations are explained in File explaination. The num_cores can be set depend on how many cores you want to use for parrallel computing.
-
-MapperPlotter is just plotting the nodes and edges, use forceNetwork if you want to interact with the plot, and ggraph could get you more informations in label. **avg** will give you the mean feature of each node if you set it as TRUE, in the example below, circle_data\$circle is the feature.
-
-### Output data
-
-| Name | Context |
-|------------------------------------|------------------------------------|
-| **adjacency** | 24x24 adjacency matrix, 0 or 1 |
-| **num_vertices** | Mapper nodes num |
-| **level_of_vertex** | Each node represent to which level set index, correspond to intervals. |
-| **points_in_vertex** | Each node carries original data index |
-| **points_in_level_set** | Each level set(16) include data point index, level set represent data subset in a lens function |
-| **vertices_in_level_set** | Which node represent to a level set |
-
-## Plots
-There are built-in plotting functions to visualize the Mapper graph. You can choose between "ggraph" and "forceNetwork" types. Additionally, you can choose to average feature values over nodes or use conditional probability embeddings.
-
-```
-source('../../MapperAlgo/R/Plotter.R')
-
-g <- graph_from_adjacency_matrix(Mapper$adjacency, mode = "undirected")
-e_result <- eigen_centrality(g)
-MapperPlotter(Mapper, label=e_result$vector, original_data=data, avg=FALSE, use_embedding=TRUE)
-```
-
-## Correlation between Mapper graph and features
-Sometimes it is useful to find out whether the Mapper graph structure correlates with certain features in the data. For example, if Sepal.Length densities are similar to Sepal.Width densities across the nodes in the Mapper graph.
-
-```
-source('../../MapperAlgo/R/MapperCorrelation.R')
-MapperCorrelation(Mapper, original_data = original_data, labels = list(data$Sepal.Length, data$Sepal.Width))
-```
-
-
-## Grid Search for optimal cover parameters
-If you want to find optimal cover parameters for your data, you can use the GridSearch function. Observing the convergence of certain graph metrics as cover parameters change can help you select appropriate values.
-
-```
-source('../../MapperAlgo/R/GridSearch.R')
-cpe_params <- list("PW_group", "Species", "wide", "versicolor")
-data$PW_group <- ifelse(data$Sepal.Width > 1.5, "wide", "narrow")
-labels <- data%>%select(PW_group, Species)
-GridSearch(
-  filter_values = data[,1:4],
-  label = labels,
-  column = "Species",
-  cover_type = "stride",
-  width_vec = c(1),
-  overlap_vec = c(30),
-  num_cores = 12,
-  out_dir = "../mapper_grid_outputs",
-  avg = TRUE,
-  use_embedding = cpe_params
+```{r fuzzy-mapper, eval=FALSE}
+f_mapper <- FuzzyMapperAlgo(
+  original_data = X,
+  filter_values = lens,
+  cluster_n = 6,
+  fcm_threshold = 0.10,
+  methods = "kmeans",
+  method_params = list(max_kmeans_clusters = 3),
+  num_cores = 1
 )
+```
+
+This variant learns cover membership from the observed lens distribution, but fuzzy-cover fitting occurs before the parallel level-set clustering.
+
+## G-Mapper: a Gaussianity-driven cover
+
+`GMapperAlgo()` accepts a one-dimensional filter. Starting with its complete range, `recursive_gaussian_split()` applies an Anderson--Darling normality test. A non-Gaussian interval is split with a Gaussian mixture model, and the children are enlarged according to `g_overlap`; recursion stops when the interval passes the criterion or a safety condition is reached. `AD_threshold` controls the splitting criterion.
+
+```{r gaussian-mapper, eval=FALSE}
+g_mapper <- GMapperAlgo(
+  original_data = X,
+  filter_values = lens[, 1],
+  AD_threshold = 10,
+  g_overlap = 0.10,
+  methods = "kmeans",
+  method_params = list(max_kmeans_clusters = 3),
+  num_cores = 1
+)
+```
+
+Cover learning is serial; `num_cores` parallelises only the independent clustering tasks that follow it.
+
+## Node summaries, conditional probabilities, and grid search
+
+`MapperCorrelation()` aggregates an observation-level quantity over every Mapper vertex. `CPEmbedding()` computes node-wise conditional probabilities of the form \(P(B=b\mid A=a)\), which can be passed to `MapperPlotter(..., use_embedding = TRUE)`.
+
+`GridSearch()` evaluates width--overlap combinations, renders every resulting graph, and saves the PNG files to `out_dir`. The current implementation uses DBSCAN with `eps = 0.3` and `minPts = 1` inside the grid search.
+
+```{r mapper-grid-search, eval=FALSE}
+GridSearch(
+  original_data = X,
+  filter_values = lens,
+  label = iris$Species,
+  cover_type = "stride",
+  width_vec = c(0.5, 1.0, 1.5),
+  overlap_vec = c(10, 20, 30),
+  num_cores = 2,
+  out_dir = "./man/figures/mapper_grid"
+)
+```
+
+## Performance controls
+
+The principal computational controls are `num_cores`, cover resolution, and clustering parameters. More cover elements produce more independent clustering tasks; greater overlap can repeat observations across more level sets. The package precomputes the point memberships of each vertex and constructs an edge only when two memberships intersect.
+
+```{r mapper-performance-1, echo=FALSE, out.width="76%", fig.align="center"}
+knitr::include_graphics("./man/figures/Performance1.png")
+```
+
+```{r mapper-performance-2, echo=FALSE, out.width="76%", fig.align="center"}
+knitr::include_graphics("./man/figures/Performance2.png")
 ```

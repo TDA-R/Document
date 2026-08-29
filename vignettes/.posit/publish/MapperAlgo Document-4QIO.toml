@@ -13,12 +13,9 @@ files = [
   '/.posit/publish/MapperAlgo Document-4QIO.toml',
   '/.posit/publish/deployments/deployment-90TS.toml',
   '/Mapper.Rmd',
-  '/Optimizations.Rmd',
-  '/FileExplain.Rmd',
-  '/man',
-  '/AdvanceMapper.Rmd',
-  '/Performance.Rmd'
+  '/SimplicialComplex.Rmd',
+  '/man'
 ]
-title = 'MapperAlgo Document'
+title = 'TDA-R Documentation'
 
 [r]

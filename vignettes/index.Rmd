@@ -1,5 +1,5 @@
 ---
-title: "MapperAlgo Document"
+title: "TDA-R Documentation"
 author: "Kenny Wang"
 date: "`r Sys.Date()`"
 site: bookdown::bookdown_site
@@ -10,6 +10,6 @@ documentclass: book
 
 # Introduction {-}
 
-Welcome to the technical documentation for the MapperAlgo package.
+This book documents the two R packages in the TDA-R project. **MapperAlgo** constructs and visualises Mapper graphs, including conventional, fuzzy-cover, and Gaussian-cover variants. **SimplicialComplex** constructs common simplicial complexes, computes algebraic invariants and persistent homology, and compares persistence diagrams.
 
-This document covers the implementation details of the Mapper algorithm for Topological Data Analysis (TDA). You can use the menu on the left to navigate through parameter settings, file structures, and performance optimizations.
+The chapters follow the same pattern: first the mathematical object, then the package interface, the returned data structure, and finally a reproducible plotting workflow. Computation-heavy examples are run locally and saved under `man/figures`; the published Posit document displays those static files with `knitr::include_graphics()`. Consequently, publishing the book does not repeat the MNIST, Flood, or persistence computations.

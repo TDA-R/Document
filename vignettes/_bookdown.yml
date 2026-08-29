@@ -1,2 +1,6 @@
 rmd_files:
-  html: ["index.Rmd", "Mapper.Rmd", "AdvanceMapper.Rmd", "FileExplain.Rmd", "Optimizations.Rmd", "Performance.Rmd"]
+  html:
+    - "index.Rmd"
+    - "Mapper.Rmd"
+    - "SimplicialComplex.Rmd"
+delete_merged_file: true
