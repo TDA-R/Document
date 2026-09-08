@@ -13,11 +13,11 @@ theta <- seq(0, 2 * pi, length.out = 25)[-25]
 circle <- cbind(cos(theta), sin(theta))
 ```
 
-A complex is stored as a list of integer vertex-index vectors. For example, `list(1L, 2L, c(1L, 2L))` contains two vertices and their edge. A filtration is a sorted list whose entries have the form `list(simplex = <integer vector>, t = <numeric>)`; `t` is the entry time. This common filtration format is accepted by the persistence functions regardless of how the complex was constructed.
+A complex is stored as a list of integer vertex-index vectors. For example, `list(1L, 2L, c(1L, 2L))` contains two vertices and their edge. A filtration is a sorted list whose entries have the form `list(simplex, t)`; `t` is the entry time. This common filtration format is accepted by the persistence functions regardless of how the complex was constructed.
 
 ## Faces, boundary matrices, Betti numbers, and Euler characteristic
 
-`faces()` enumerates unique faces at a requested dimension. `boundary()` constructs the sparse boundary operator \(\partial_k\). `betti_number()` obtains \(\beta_k\) from numerical boundary-matrix ranks over the real numbers, and `euler_characteristic()` computes the alternating sum of face counts.
+`faces()` enumerates unique faces at a requested dimension. `boundary()` constructs the sparse boundary operator (\partial\_k). `betti_number()` obtains (\beta\_k) from numerical boundary-matrix ranks over the real numbers, and `euler_characteristic()` computes the alternating sum of face counts.
 
 ```{r sc-algebra, eval=FALSE}
 circle_complex <- list(
@@ -26,20 +26,20 @@ circle_complex <- list(
 )
 
 faces(circle_complex, target_dim = 1)
-boundary(circle_complex, k = 1)
-betti_number(circle_complex, k = 0)
-betti_number(circle_complex, k = 1)
-euler_characteristic(circle_complex)
+boundary(circle_complex, 1)
+betti_number(circle_complex, 0)
+betti_number(circle_complex, 1)
+euler_characteristic(circle_complex, tol=0.1)
 ```
 
-The tolerance argument used by the rank calculations is numerical rather than a filtration threshold. For persistent homology, the package instead reduces boundary columns over \(\mathbb{F}_2\).
+The tolerance argument used by the rank calculations is numerical rather than a filtration threshold. For persistent homology, the package instead reduces boundary columns over (\mathbb{F}\_2).
 
 ## Point-cloud complex constructions
 
 `build_filtration()` provides one interface for Vietoris--Rips, Čech, Alpha, Delaunay, and Witness constructions. Flood and cubical filtrations have dedicated builders because their inputs and controls differ.
 
 | Construction | Main function | Principal controls | Interpretation |
-|---|---|---|---|
+|------------------------------------|------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Vietoris--Rips | `VietorisRipsComplex()` or `build_filtration(method = "VR")` | `epsilon` or `eps_max` | Adds an edge when two points are within the scale and fills every clique. |
 | Čech | `CechComplex()` or `build_filtration(method = "Cech")` | `epsilon` or `eps_max` | Uses common intersections of equal-radius balls; exact minimum-enclosing-ball radii determine filtration times. |
 | Alpha | `AlphaComplex()` or `build_filtration(method = "Alpha")` | `epsilon` or optional `eps_max` | Restricts Delaunay faces by their alpha values. |
@@ -49,21 +49,10 @@ The tolerance argument used by the rank calculations is numerical rather than a 
 | Cubical | `build_cubical_filtration()` | `image`, `superlevel` | Triangulates a two-dimensional grid and assigns lower-star values from the image. |
 
 ```{r sc-builders, eval=FALSE}
-vr <- build_filtration(
-  circle, method = "VR", eps_max = 0.80, max_dimension = 1
-)
-
-cech <- build_filtration(
-  circle, method = "Cech", eps_max = 0.45, max_dimension = 1
-)
-
-alpha <- build_filtration(
-  circle, method = "Alpha", max_dimension = 1
-)
-
-delaunay <- build_filtration(
-  circle, method = "Delaunay", max_dimension = 1
-)
+vr <- build_filtration(circle, method = "VR", eps_max = 0.80, max_dimension = 1)
+cech <- build_filtration(circle, method = "Cech", eps_max = 0.45, max_dimension = 1)
+alpha <- build_filtration(circle, method = "Alpha", max_dimension = 1)
+delaunay <- build_filtration(circle, method = "Delaunay", max_dimension = 1)
 
 witness <- build_filtration(
   circle,
@@ -75,7 +64,7 @@ witness <- build_filtration(
 )
 ```
 
-When `max_dimension = k` is supplied, the builder retains simplices through dimension \(k+1\) internally. Those extra simplices are necessary to determine which \(k\)-dimensional classes die; only the requested dimensions are reported later.
+When `max_dimension = k` is supplied, the builder retains simplices through dimension (k+1) internally. Those extra simplices are necessary to determine which (k)-dimensional classes die; only the requested dimensions are reported later.
 
 ```{r sc-constructions-static, echo=FALSE, out.width="92%", fig.align="center"}
 knitr::include_graphics("./man/figures/ComplexConstructions.png")
@@ -83,7 +72,7 @@ knitr::include_graphics("./man/figures/ComplexConstructions.png")
 
 ### Vietoris--Rips and Čech
 
-Vietoris--Rips is combinatorial: pairwise distances create a graph and maximal cliques create higher-dimensional simplices. A simplex enters at its largest pairwise distance. Čech first uses the \(2\epsilon\) distance graph to generate candidates, then evaluates the minimum enclosing ball of each candidate. The latter more directly represents ball intersections but is usually more expensive.
+Vietoris--Rips is combinatorial: pairwise distances create a graph and maximal cliques create higher-dimensional simplices. A simplex enters at its largest pairwise distance. Čech first uses the (2\epsilon) distance graph to generate candidates, then evaluates the minimum enclosing ball of each candidate. The latter more directly represents ball intersections but is usually more expensive.
 
 ### Alpha and Delaunay
 
@@ -124,9 +113,7 @@ knitr::include_graphics("./man/figures/FloodComplex.png")
 `build_cubical_filtration()` accepts a numeric matrix. Every grid cell is divided into two triangles and a simplex enters at the maximum value of its vertices, producing a lower-star filtration. With `superlevel = TRUE`, values are negated so that large original values enter first.
 
 ```{r sc-cubical, eval=FALSE}
-image_values <- outer(seq(-1, 1, length.out = 30),
-                      seq(-1, 1, length.out = 30),
-                      function(x, y) sqrt(x^2 + y^2))
+image_values <- outer(seq(-1, 1, length.out = 30), seq(-1, 1, length.out = 30), function(x, y) sqrt(x^2 + y^2))
 
 cubical <- build_cubical_filtration(image_values)
 cubical_pairs <- persistence_pairs(cubical, max_dimension = 1)
@@ -134,19 +121,13 @@ cubical_pairs <- persistence_pairs(cubical, max_dimension = 1)
 
 ## Persistent homology and persistence diagrams
 
-`persistence_pairs()` performs sparse column reduction over \(\mathbb{F}_2\), representing a reduced column by sorted row indices instead of allocating a dense \(m\times m\) matrix. It returns `dim`, `birth`, and `death`; an infinite death denotes an essential class. `flood_persistence()` exposes the same sparse workflow for Flood filtrations.
+`persistence_pairs()` performs sparse column reduction over (\mathbb{F}\_2), representing a reduced column by sorted row indices instead of allocating a dense (m\times m) matrix. It returns `dim`, `birth`, and `death`; an infinite death denotes an essential class. `flood_persistence()` exposes the same sparse workflow for Flood filtrations.
 
 ```{r sc-persistence, eval=FALSE}
 pairs <- persistence_pairs(vr, max_dimension = 1)
 pd <- plot_persistence(pairs)
 
-ggplot2::ggsave(
-  "./man/figures/PersistenceDiagram.png",
-  pd,
-  width = 7,
-  height = 5,
-  dpi = 180
-)
+ggplot2::ggsave("./man/figures/PersistenceDiagram.png", pd, width = 7, height = 5, dpi = 180)
 ```
 
 ```{r sc-persistence-static, echo=FALSE, out.width="72%", fig.align="center"}
@@ -157,34 +138,18 @@ For smaller diagnostic calculations, `boundary_info()` builds and reduces the de
 
 ```{r sc-persistence-dense, eval=FALSE}
 reduction <- boundary_info(vr, max_dimension = 1)
-pairs_dense <- extract_persistence_pairs(
-  vr,
-  reduction$last_1,
-  reduction$pivot_owner,
-  max_dimension = 1
-)
+pairs_dense <- extract_persistence_pairs(vr, reduction$last_1, reduction$pivot_owner, max_dimension = 1)
 ```
 
 ## Persistence landscapes
 
-`persistence_landscape()` converts finite birth--death pairs in one homological dimension into discretised landscape levels \(\lambda_k(t)\). Essential classes are reported and omitted because their death time is infinite. `plot_landscape()` returns the corresponding `ggplot2` object.
+`persistence_landscape()` converts finite birth--death pairs in one homological dimension into discretised landscape levels (\lambda\_k(t)). Essential classes are reported and omitted because their death time is infinite. `plot_landscape()` returns the corresponding `ggplot2` object.
 
 ```{r sc-landscape, eval=FALSE}
-landscape <- persistence_landscape(
-  cubical_pairs,
-  dimension = 0,
-  k_max = 5,
-  resolution = 500
-)
+landscape <- persistence_landscape(cubical_pairs, dimension = 0, k_max = 5, resolution = 500)
 
 landscape_plot <- plot_landscape(landscape)
-ggplot2::ggsave(
-  "./man/figures/PersistenceLandscape.png",
-  landscape_plot,
-  width = 7,
-  height = 5,
-  dpi = 180
-)
+ggplot2::ggsave("./man/figures/PersistenceLandscape.png", landscape_plot, width = 7, height = 5, dpi = 180)
 ```
 
 ```{r sc-landscape-static, echo=FALSE, out.width="72%", fig.align="center"}
@@ -193,35 +158,21 @@ knitr::include_graphics("./man/figures/PersistenceLandscape.png")
 
 ## Diagram distances and optimal matching
 
-`wasserstein_distance()` computes the exact assignment cost with the Hungarian algorithm; its defaults are order \(p=2\) and the Euclidean ground metric. `bottleneck_distance()` searches the exact smallest threshold that admits a perfect matching and defaults to the \(L_\infty\) ground metric. Both match ordinary points either to the other diagram or to the diagonal.
+`wasserstein_distance()` computes the exact assignment cost with the Hungarian algorithm; its defaults are order (p=2) and the Euclidean ground metric. `bottleneck_distance()` searches the exact smallest threshold that admits a perfect matching and defaults to the (L\_\infty) ground metric. Both match ordinary points either to the other diagram or to the diagonal.
 
 ```{r sc-distances, eval=FALSE}
 set.seed(7)
 circle_b <- circle + matrix(rnorm(length(circle), sd = 0.03), ncol = 2)
 pairs_b <- persistence_pairs(
-  build_filtration(circle_b, method = "VR", eps_max = 0.80,
-                   max_dimension = 1),
+  build_filtration(circle_b, method = "VR", eps_max = 0.80, max_dimension = 1),
   max_dimension = 1
 )
 
 wasserstein_distance(pairs, pairs_b, dimension = 1, p = 2, ground = "L2")
 bottleneck_distance(pairs, pairs_b, dimension = 1, ground = "Linf")
 
-matching <- diagram_matching(
-  pairs,
-  pairs_b,
-  dimension = 1,
-  distance = "bottleneck",
-  ground = "Linf"
-)
-
-matching_plot <- plot_matching(
-  pairs,
-  pairs_b,
-  dimension = 1,
-  distance = "bottleneck",
-  ground = "Linf"
-)
+matching <- diagram_matching(pairs, pairs_b, dimension = 1, distance = "bottleneck", ground = "Linf")
+matching_plot <- plot_matching(pairs, pairs_b, dimension = 1, distance = "bottleneck", ground = "Linf")
 ```
 
 ```{r sc-matching-static, echo=FALSE, out.width="74%", fig.align="center"}
@@ -253,55 +204,3 @@ cloud_distance <- complex_distance(
 )
 cloud_distance$distance
 ```
-
-## Interactive Shiny explorer
-
-The app is titled **Simplicial Complex Explorer**. Its three input modes are **Simplices (manual)**, **Data points → VR simplices**, and **Data points → Flood complex**. The result tabs are **Faces**, **Boundary Matrix**, **Betti Numbers**, **Euler Characteristic**, **Abstract Simplicial Complex**, **Flood Complex Guide**, and **Persistence (Flood)**. The deployed playground is available at [SimplicialComplex Shiny playground](https://tf3q5u-0-0.shinyapps.io/simplicialcomplex/).
-
-The remaining control labels in the current source are: **Input Simplices**; **Points (each line: x,y)**; **ε (VR edge threshold)**; **Point cloud** with **Circle**, **Two circles**, **Annulus**, and **Custom (textarea)**; **Number of witness points**; **Number of landmarks (FPS)**; **Grid points per edge**; **Flood threshold t**; **Show flood balls (radius t)**; **Target Dimension k**; **tolerance (for Betti & Euler)**; and **Compute**. The panel headings are **Plot**, **Flood complex at threshold t**, **Faces Interpretation**, **Boundary Matrix \(\partial_k\)**, **Betti Number \(\beta_k\)**, **Euler Characteristic \(\chi\)**, **Abstract Simplicial Complex**, **How the Flood Complex works**, and **Persistence Diagram**. The Faces tab also displays the source sentence “simplicial complex outputs the faces of dimension \(k\)(points, edge,...)”.
-
-The Flood guide illustration itself is labelled **1. Point cloud + FPS landmarks**, **grey = data points (flood sources)**, **orange = landmarks**, **2. Delaunay on landmarks**, **vertex = 0-simplex, edge = 1-simplex**, **triangle = 2-simplex (3D adds tetrahedra)**, **3. Grid on one simplex**, **each grid point queries its nearest data point (dashed)**, and **filtration value = the maximum of those distances**.
-
-For local development, run the following from `Document/vignettes`:
-
-```{r sc-shiny, eval=FALSE}
-shiny::runApp("../../SimplicialComplex")
-```
-
-The current package checkout needs two source corrections before that local command can succeed: `app.R` is missing a separator after `half <- n %/% 2` in `generate_cloud()`, and it still sources `R/AbstractSimplicialComplex.R` even though that file was removed. These source-tree issues do not affect the static documentation or the deployed playground link above.
-
-The following Flood explanation is transcribed verbatim from the current Shiny source.
-
-> The Flood complex (Graf et al., NeurIPS 2025) makes persistent homology feasible on large point clouds by separating two roles: a small set of **landmarks** determines *which simplices can exist*, while the **full point cloud** determines *when each simplex appears*.
-
-1. **Landmarks (FPS).** Pick a small number of well-spread representatives via Farthest-Point Sampling: repeatedly add the point farthest from those already chosen.
-
-2. **Delaunay = the candidate simplices.** The Delaunay triangulation of the landmarks *is* a simplicial complex: each triangle (tetrahedron in 3D) is a top simplex, and its vertex subsets are the lower faces. No extra geometry is needed — only subset enumeration. The complex size depends only on the number of landmarks.
-
-3. **Flood time via a barycentric grid.** Imagine water rising from every data point: at time \(t\) each point carries a ball of radius \(t\). A simplex \(\sigma\) enters the complex once it is fully submerged. To estimate that time, sample \(\sigma\) with a barycentric grid (weights \(w_i \ge 0, \sum w_i = 1\), with a barycentric grid (weights \(w_i \ge 0, \sum w_i = 1\), discretized with *points_per_edge* steps) and set
-
-   \[
-   f(\sigma) = \max_{g \in \text{grid}(\sigma)} \min_{x \in X} \lVert g-x\rVert
-   \]
-
-   — the hardest-to-reach spot on the simplex decides its flood time. Grid points are probes only; they are discarded afterwards.
-
-4. **Persistence.** Sort simplices by flood time and run the usual boundary-matrix reduction. Simplices that stretch across empty regions (holes) flood late, so the holes survive long and appear far from the diagonal in the persistence diagram.
-
-> **Try it:** switch the input mode to *Data points → Flood complex*, press Compute, then drag the threshold slider to watch the complex flood in. The tabs above (Faces, Boundary, Betti, Euler) always describe the sub-complex at the current threshold, and the Persistence tab shows which classes are alive.
-
-The Persistence tab contains this text, also reproduced verbatim:
-
-> Each point is a homology class: born at x, dead at y. Classes far above the diagonal are true topological features; classes near it are noise. The dashed cross marks the current threshold \(t\): classes with birth \(\le t <\) death are alive in the complex shown above.
-
-## Local figure generation and Posit publishing
-
-`generate_figures.R` loads the local SimplicialComplex source, runs deterministic examples, and writes the five SimplicialComplex PNG files used in this chapter. Execute it locally whenever package behaviour or figure styling changes. The MNIST image is generated separately as shown in the Mapper chapter.
-
-The book itself uses static inclusion, for example:
-
-```{r sc-posit-example, eval=FALSE}
-knitr::include_graphics("./man/figures/PersistenceDiagram.png")
-```
-
-This division is intentional: local R performs the computation and saves the image, whereas the Posit renderer only assembles the R Markdown pages and existing image files.

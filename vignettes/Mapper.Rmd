@@ -8,7 +8,7 @@ knitr::include_graphics("./man/figures/mapper.png")
 
 ## Installation and a minimal example
 
-Use the installed package for ordinary analysis. During package development, `pkgload::load_all("../../MapperAlgo")` may replace `library(MapperAlgo)` when this document is run from `Document/vignettes`.
+Use the installed package by `install.packages('MapperAlgo')`.
 
 ```{r mapper-example, eval=FALSE}
 library(MapperAlgo)
@@ -26,13 +26,26 @@ mapper <- MapperAlgo(
   cover_type = "stride",
   num_cores = 1
 )
+
+# This is the new version of clustering method, which uses mlr3cluster package.
+# It is more flexible but a longer calculation time since it need to package up from mlr3.
+
+# mapper <- MapperAlgo(
+#   data[,1:4],
+#   filter_values = data[,1:3],
+#   percent_overlap = 30,
+#   method = lrn("clust.kmeans", centers = 2),
+#   cover_type = 'stride',
+#   interval_width = 1,
+#   num_cores = 12
+# )
 ```
 
-`original_data` is used for within-level-set clustering, whereas `filter_values` defines the cover. Supply exactly one of `intervals` and `interval_width`: the package computes the other quantity. For a multidimensional lens, a product cover is formed across its columns.
+`original_data` is used for within-level-set clustering, whereas `filter_values` defines the cover. Supply exactly one of `intervals` and `interval_width`: the package computes the other quantity. For a multidimensional lens, a product cover is formed across its columns. Use `method` if you want to try out the new features that integrated `mlr3` pacakge to the clustering for each interval.
 
 ## Covers and level-set indexing
 
-`cover_type = "stride"` uses intervals of width \(w\) whose starting positions differ by \(w(1-p/100)\). `cover_type = "extension"` places width-\(w\) anchors without overlap, then extends each boundary by \(wp/200\). In both cases, `percent_overlap` is entered as a percentage such as `30`, not as `0.30`.
+`cover_type = "stride"` uses intervals of width (w) whose starting positions differ by (w(1-p/100)). `cover_type = "extension"` places width-(w) anchors without overlap, then extends each boundary by (wp/200). In both cases, `percent_overlap` is entered as a percentage such as `30`, not as `0.30`.
 
 ```{r mapper-cover, echo=FALSE, out.width="76%", fig.align="center"}
 knitr::include_graphics("./man/figures/Cover.png")
@@ -45,7 +58,7 @@ knitr::include_graphics("./man/figures/Cover.png")
 The `methods` argument selects one of four implemented methods. The corresponding controls belong in `method_params`.
 
 | `methods` value | Principal controls | Behaviour |
-|---|---|---|
+|-----------------------------------|-----------------------------------------------------|--------------------------------------------------------------------------------------------------------------|
 | `"hierarchical"` | `method`, `num_bins_when_clustering` | Cuts a hierarchical tree at the first empty distance-histogram bin. |
 | `"kmeans"` | `max_kmeans_clusters` | Searches up to the requested number of centres; the default maximum is two. |
 | `"dbscan"` | `eps`, `minPts` | Excludes observations labelled as noise when positive clusters exist. |
@@ -58,7 +71,7 @@ Independent level sets are processed by a PSOCK worker pool controlled by `num_c
 `MapperAlgo()` returns an object of class `Mapper`. `FuzzyMapperAlgo()` and `GMapperAlgo()` use the same core representation and add their own class and input parameters.
 
 | Field | Meaning |
-|---|---|
+|----------------------------------------------------|----------------------------------------------------------------------------------------------------|
 | `adjacency` | Symmetric, zero-diagonal vertex adjacency matrix. |
 | `num_vertices` | Number of clusters, hence Mapper vertices. |
 | `level_of_vertex` | Level-set index from which each vertex was produced. |
@@ -71,16 +84,12 @@ Edges are created when the two lists in `points_in_vertex` intersect. The adjace
 
 ## Interactive plotting and PNG export
 
-`MapperPlotter()` returns a `networkD3` widget. Vertex size represents the number of observations, edge weight represents shared observations, and colour can show a majority label, an average numeric label, or a precomputed embedding statistic. Because a widget is HTML rather than a native R graphics object, save it with `save_mapper_png()`.
+`MapperPlotter()` returns a `networkD3` widget. Vertex size represents the number of observations, edge weight represents shared observations, and colour can show a majority label, an average numeric label, or a precomputed embedding statistic, then save it with `save_mapper_png()`. You can also try `MapperPlotter3D` if you're interest in 3D plot.
 
 ```{r mapper-save, eval=FALSE}
-widget <- MapperPlotter(
-  Mapper = mapper,
-  original_data = X,
-  label = iris$Species,
-  avg = FALSE,
-  use_embedding = FALSE
-)
+
+widget <- MapperPlotter(mapper, label=iris$Species, avg=FALSE, use_embedding=FALSE)
+# widget <- MapperPlotter3D(mapper, label=iris$Species, avg=FALSE, use_embedding=FALSE)
 
 save_mapper_png(
   widget,
@@ -92,42 +101,9 @@ save_mapper_png(
 )
 ```
 
-The export uses `htmlwidgets` and `webshot2`; a working Chrome or Chromium installation is therefore required for the screenshot step. Once saved, the static PNG can be included in the Posit document without rebuilding the widget.
-
-## MNIST example
-
-Download `mnist_train.csv` and `mnist_test.csv` from the [MNIST dataset page](https://git-disl.github.io/GTDLBench/datasets/mnist_datasets/) and place them under `PaperExample/Data/MNIST_CSV/`. From the `PaperExample` directory, the following extension to `mapper.R` saves the graph used here:
-
-```{r mnist-save, eval=FALSE}
-source("mapper.R")
-
-mnist_widget <- MapperPlotter(
-  Mapper = Mapper,
-  original_data = mnist_sample,
-  label = labels,
-  avg = FALSE,
-  use_embedding = FALSE
-)
-
-save_mapper_png(
-  mnist_widget,
-  "../Document/vignettes/man/figures/MNISTMapper.png",
-  vwidth = 1600,
-  vheight = 1100,
-  zoom = 2,
-  delay = 1
-)
-```
-
-The published page reads the already generated file:
-
-```{r mnist-static, echo=FALSE, out.width="82%", fig.align="center"}
-knitr::include_graphics("./man/figures/MNISTMapper.png")
-```
-
 ## F-Mapper: a fuzzy learned cover
 
-`FuzzyMapperAlgo()` replaces the rectangular cover by fuzzy c-means membership functions in the filter space. `cluster_n` specifies the number of fuzzy cover elements. An observation belongs to cover element \(j\) when its membership exceeds `fcm_threshold`; if no threshold is supplied, the package uses `min(0.1, 1 / cluster_n)`. The pullback sets may overlap, after which the same clustering and nerve construction used by conventional Mapper is applied.
+`FuzzyMapperAlgo()` replaces the rectangular cover by fuzzy c-means membership functions in the filter space. `cluster_n` specifies the number of fuzzy cover elements. An observation belongs to cover element (j) when its membership exceeds `fcm_threshold`; if no threshold is supplied, the package uses `min(0.1, 1 / cluster_n)`. The pullback sets may overlap, after which the same clustering and nerve construction used by conventional Mapper is applied.
 
 ```{r fuzzy-mapper, eval=FALSE}
 f_mapper <- FuzzyMapperAlgo(
@@ -151,19 +127,37 @@ This variant learns cover membership from the observed lens distribution, but fu
 g_mapper <- GMapperAlgo(
   original_data = X,
   filter_values = lens[, 1],
-  AD_threshold = 10,
-  g_overlap = 0.10,
+  AD_threshold = 0.5,
+  g_overlap = 0.5,
   methods = "kmeans",
-  method_params = list(max_kmeans_clusters = 3),
+  method_params = list(max_kmeans_clusters = 2),
   num_cores = 1
 )
 ```
 
-Cover learning is serial; `num_cores` parallelises only the independent clustering tasks that follow it.
+## Frontend
+
+If you want to try out the frontend to analyse your data, you can try out our [Frontend](https://tda-rfrontend.vercel.app/) for a better understand with toy data results and your own data.
+
+```{r frontend-save, eval=FALSE}
+library(jsonlite)
+
+export_data <- list(
+  adjacency = GMapper$adjacency,
+  num_vertices = GMapper$num_vertices,
+  level_of_vertex = GMapper$level_of_vertex,
+  points_in_vertex = GMapper$points_in_vertex,
+  original_data = data
+)
+
+write(toJSON(export_data, auto_unbox = TRUE), "~/desktop/data.json")
+```
+
+![](man/figures/frontend.png){width="914"}
 
 ## Node summaries, conditional probabilities, and grid search
 
-`MapperCorrelation()` aggregates an observation-level quantity over every Mapper vertex. `CPEmbedding()` computes node-wise conditional probabilities of the form \(P(B=b\mid A=a)\), which can be passed to `MapperPlotter(..., use_embedding = TRUE)`.
+`MapperCorrelation()` aggregates an observation-level quantity over every Mapper vertex. `CPEmbedding()` computes node-wise conditional probabilities of the form (P(B=b\mid A=a)), which can be passed to `MapperPlotter(..., use_embedding = TRUE)`.
 
 `GridSearch()` evaluates width--overlap combinations, renders every resulting graph, and saves the PNG files to `out_dir`. The current implementation uses DBSCAN with `eps = 0.3` and `minPts = 1` inside the grid search.
 

@@ -86,8 +86,7 @@ save_base_png("ComplexConstructions.png", {
   )
   graphics::points(circle_noisy, pch = 19, col = "#3b7ea1")
 
-  alpha_triangles <- Filter(function(simplex) length(simplex) == 3L,
-                            alpha_complex$simplices)
+  alpha_triangles <- Filter(function(simplex) length(simplex) == 3L, alpha_complex$simplices)
   graphics::plot(
     circle_noisy,
     asp = 1,
@@ -105,8 +104,8 @@ save_base_png("ComplexConstructions.png", {
       border = NA
     )
   }
-  draw_edges(circle_noisy, simplex_edges(alpha_complex$simplices),
-             colour = "#b25912")
+  draw_edges(circle_noisy, simplex_edges(alpha_complex$simplices), colour = "#b25912")
+
   graphics::points(circle_noisy, pch = 19, col = "#c76b1d")
 
   landmark_points <- witness_complex$landmarks
@@ -130,15 +129,10 @@ save_base_png("ComplexConstructions.png", {
                   outer = TRUE, font = 2, cex = 1.05)
 })
 
-vr_filtration <- build_filtration(
-  circle,
-  method = "VR",
-  eps_max = 1.85,
-  max_dimension = 1
-)
+vr_filtration <- build_filtration(circle, method = "VR", eps_max = 1.85, max_dimension = 1)
 vr_pairs <- persistence_pairs(vr_filtration, max_dimension = 1)
-
 pd_plot <- plot_persistence(vr_pairs)
+
 ggplot2::ggsave(
   file.path(figure_dir, "PersistenceDiagram.png"),
   pd_plot,
@@ -148,13 +142,9 @@ ggplot2::ggsave(
   bg = "white"
 )
 
-landscape <- persistence_landscape(
-  vr_pairs,
-  dimension = 1,
-  k_max = 1,
-  resolution = 500
-)
+landscape <- persistence_landscape(vr_pairs, dimension = 1, k_max = 1, resolution = 500)
 landscape_plot <- plot_landscape(landscape)
+
 ggplot2::ggsave(
   file.path(figure_dir, "PersistenceLandscape.png"),
   landscape_plot,
@@ -164,12 +154,7 @@ ggplot2::ggsave(
   bg = "white"
 )
 
-noisy_filtration <- build_filtration(
-  circle_noisy,
-  method = "VR",
-  eps_max = 1.85,
-  max_dimension = 1
-)
+noisy_filtration <- build_filtration(circle_noisy, method = "VR", eps_max = 1.85, max_dimension = 1)
 noisy_pairs <- persistence_pairs(noisy_filtration, max_dimension = 1)
 matching_plot <- plot_matching(
   vr_pairs,
@@ -188,7 +173,6 @@ ggplot2::ggsave(
   bg = "white"
 )
 
-set.seed(20260717)
 n_flood <- 400L
 theta_flood <- stats::runif(n_flood, 0, 2 * pi)
 group <- rep(c(-1.25, 1.25), each = n_flood / 2)
