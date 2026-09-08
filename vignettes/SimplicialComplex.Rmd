@@ -17,7 +17,7 @@ A complex is stored as a list of integer vertex-index vectors. For example, `lis
 
 ## Faces, boundary matrices, Betti numbers, and Euler characteristic
 
-`faces()` enumerates unique faces at a requested dimension. `boundary()` constructs the sparse boundary operator (\partial\_k). `betti_number()` obtains (\beta\_k) from numerical boundary-matrix ranks over the real numbers, and `euler_characteristic()` computes the alternating sum of face counts.
+`faces()` enumerates unique faces at a requested dimension. `boundary()` constructs the sparse boundary operator ($\partial_k$). `betti_number()` obtains ($\beta_k$) from numerical boundary-matrix ranks over the real numbers, and `euler_characteristic()` computes the alternating sum of face counts.
 
 ```{r sc-algebra, eval=FALSE}
 circle_complex <- list(
@@ -32,14 +32,14 @@ betti_number(circle_complex, 1)
 euler_characteristic(circle_complex, tol=0.1)
 ```
 
-The tolerance argument used by the rank calculations is numerical rather than a filtration threshold. For persistent homology, the package instead reduces boundary columns over (\mathbb{F}\_2).
+The tolerance argument used by the rank calculations is numerical rather than a filtration threshold. For persistent homology, the package instead reduces boundary columns over ($\mathbb{F}_2$).
 
 ## Point-cloud complex constructions
 
 `build_filtration()` provides one interface for Vietoris--Rips, Čech, Alpha, Delaunay, and Witness constructions. Flood and cubical filtrations have dedicated builders because their inputs and controls differ.
 
 | Construction | Main function | Principal controls | Interpretation |
-|------------------------------------|------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|---------------|---------------|---------------|----------------------------|
 | Vietoris--Rips | `VietorisRipsComplex()` or `build_filtration(method = "VR")` | `epsilon` or `eps_max` | Adds an edge when two points are within the scale and fills every clique. |
 | Čech | `CechComplex()` or `build_filtration(method = "Cech")` | `epsilon` or `eps_max` | Uses common intersections of equal-radius balls; exact minimum-enclosing-ball radii determine filtration times. |
 | Alpha | `AlphaComplex()` or `build_filtration(method = "Alpha")` | `epsilon` or optional `eps_max` | Restricts Delaunay faces by their alpha values. |
@@ -72,11 +72,11 @@ knitr::include_graphics("./man/figures/ComplexConstructions.png")
 
 ### Vietoris--Rips and Čech
 
-Vietoris--Rips is combinatorial: pairwise distances create a graph and maximal cliques create higher-dimensional simplices. A simplex enters at its largest pairwise distance. Čech first uses the (2\epsilon) distance graph to generate candidates, then evaluates the minimum enclosing ball of each candidate. The latter more directly represents ball intersections but is usually more expensive.
+Vietoris--Rips is combinatorial: pairwise distances create a graph, and maximal cliques create higher-dimensional simplices. A simplex enters at its largest pairwise distance. Čech first uses the ($2\epsilon$) distance graph to generate candidates, then evaluates the minimum enclosing ball of each candidate. The latter more directly represents ball intersections but is usually more expensive.
 
 ### Alpha and Delaunay
 
-Delaunay triangulation limits the candidate faces geometrically. The Alpha complex retains only faces whose alpha values do not exceed the selected scale; Delaunay is the corresponding uncapped construction. These methods require the optional `geometry` dependency and coordinates in a configuration accepted by its triangulation routines.
+Delaunay triangulation geometrically limits the candidate faces. The Alpha complex retains only faces whose alpha values do not exceed the selected scale; the corresponding uncapped construction is Delaunay. These methods require the optional `geometry` dependency and coordinates in a configuration accepted by its triangulation routines.
 
 ### Witness
 
@@ -121,7 +121,7 @@ cubical_pairs <- persistence_pairs(cubical, max_dimension = 1)
 
 ## Persistent homology and persistence diagrams
 
-`persistence_pairs()` performs sparse column reduction over (\mathbb{F}\_2), representing a reduced column by sorted row indices instead of allocating a dense (m\times m) matrix. It returns `dim`, `birth`, and `death`; an infinite death denotes an essential class. `flood_persistence()` exposes the same sparse workflow for Flood filtrations.
+`persistence_pairs()` performs sparse column reduction over ($\mathbb{F}_2$), representing a reduced column by sorted row indices instead of allocating a dense ($m\times m$) matrix. It returns `dim`, `birth`, and `death`; an infinite death denotes an essential class. `flood_persistence()` exposes the same sparse workflow for Flood filtrations.
 
 ```{r sc-persistence, eval=FALSE}
 pairs <- persistence_pairs(vr, max_dimension = 1)
@@ -143,7 +143,7 @@ pairs_dense <- extract_persistence_pairs(vr, reduction$last_1, reduction$pivot_o
 
 ## Persistence landscapes
 
-`persistence_landscape()` converts finite birth--death pairs in one homological dimension into discretised landscape levels (\lambda\_k(t)). Essential classes are reported and omitted because their death time is infinite. `plot_landscape()` returns the corresponding `ggplot2` object.
+`persistence_landscape()` converts finite birth--death pairs in one homological dimension into discretised landscape levels ($\lambda_k(t)$). Essential classes are reported and omitted because their death time is infinite. `plot_landscape()` returns the corresponding `ggplot2` object.
 
 ```{r sc-landscape, eval=FALSE}
 landscape <- persistence_landscape(cubical_pairs, dimension = 0, k_max = 5, resolution = 500)
@@ -158,7 +158,7 @@ knitr::include_graphics("./man/figures/PersistenceLandscape.png")
 
 ## Diagram distances and optimal matching
 
-`wasserstein_distance()` computes the exact assignment cost with the Hungarian algorithm; its defaults are order (p=2) and the Euclidean ground metric. `bottleneck_distance()` searches the exact smallest threshold that admits a perfect matching and defaults to the (L\_\infty) ground metric. Both match ordinary points either to the other diagram or to the diagonal.
+`wasserstein_distance()` computes the exact assignment cost with the Hungarian algorithm; its defaults are order (p=2) and the Euclidean ground metric. `bottleneck_distance()` searches the exact smallest threshold that admits a perfect matching and defaults to the ($L_\infty$) ground metric. Both match ordinary points either to the other diagram or to the diagonal.
 
 ```{r sc-distances, eval=FALSE}
 set.seed(7)

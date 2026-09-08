@@ -157,7 +157,7 @@ write(toJSON(export_data, auto_unbox = TRUE), "~/desktop/data.json")
 
 ## Node summaries, conditional probabilities, and grid search
 
-`MapperCorrelation()` aggregates an observation-level quantity over every Mapper vertex. `CPEmbedding()` computes node-wise conditional probabilities of the form (P(B=b\mid A=a)), which can be passed to `MapperPlotter(..., use_embedding = TRUE)`.
+`MapperCorrelation()` aggregates an observation-level quantity over every Mapper vertex. `CPEmbedding()` computes node-wise conditional probabilities of the form ($P(B=b\mid A=a)$), which can be passed to `MapperPlotter(..., use_embedding = TRUE)`.
 
 `GridSearch()` evaluates width--overlap combinations, renders every resulting graph, and saves the PNG files to `out_dir`. The current implementation uses DBSCAN with `eps = 0.3` and `minPts = 1` inside the grid search.
 
